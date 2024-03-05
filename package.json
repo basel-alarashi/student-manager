@@ -1,0 +1,17 @@
+{
+  "name": "studentmanager",
+  "version": "1.0.0",
+  "description": "Application for manage students & their grads.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon .\\index.js"
+  },
+  "author": "Team",
+  "license": "ISC",
+  "dependencies": {
+    "d3": "^7.8.5",
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7"
+  }
+}

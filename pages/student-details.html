@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style type="text/css">
+		*{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        body{
+            max-width: 100vw;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            justify-content: start;
+            gap: 10px;
+            padding: 5px 20px;
+        }
+        #modal{
+        	display: none;
+        	position: fixed;
+        	top: 0;
+        	left: 0;
+        	width: 100%;
+        	height: 100%;
+        	background-color: rgba(0, 0, 0, .5);
+        	z-index: 1;
+        }
+        #popup{
+        	background-color: white;
+        	width: 50%;
+        	margin: auto;
+        	border: 1px solid #b4b4b4;
+        	border-radius: 10px;
+        	position: relative;
+        	transform: translateY(75%);
+        	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, .4), 0 6px 20px 0 rgba(0, 0, 0, .4);
+        	animation-name: modal-zoom;
+			animation-duration: .4s;
+        }
+        #close{
+        	padding: 0;
+        	position: absolute;
+        	right: 10px;
+        	top: 5px;
+        	border: none;
+        	font-size: 24px;
+        	font-weight: 500;
+        	color: #ebb43f;
+        }
+        #close:hover{
+        	background-color: transparent;
+        	color: white;
+        }
+        #header{
+        	padding: 20px;
+        	background-color: #272088;
+        	border-radius: 10px 10px 0 0;
+        	text-align: center;
+        }
+        #header h2{
+        	color: #ebb43f;
+        }
+        #content{
+        	display: flex;
+        	flex-direction: column;
+        	align-items: center;
+        	gap: 15px;
+        	padding: 20px;
+        	color: #272088;
+        }
+        #content p{
+        	font-size: 20px;
+        	font-weight: 500;
+        }
+        .header{
+        	width: 100%;
+        	height: 202px;
+        	display: flex;
+        	align-items: start;
+        	border-bottom: 2px solid #272088;
+        }
+        .logo{
+        	flex: 1;
+        	text-align: center;
+        }
+        .logo img{
+        	width: 200px;
+        	aspect-ratio: 1 /1;
+        }
+        .right-head{
+        	height: 200px;
+        	flex: 1;
+        	display: flex;
+        	align-items: center;
+        	justify-content: space-between;
+        }
+        .details{
+        	display: flex;
+        	flex-direction: column;
+        	gap: 7px;
+        }
+        h2{
+        	font-size: 32px;
+        	font-weight: 500;
+        	color: #272088;
+        }
+        p{
+        	color: #272088;
+        	font-size: 16px;
+        	font-weight: 500;
+        }
+        span{
+        	color: #0094ff;
+        	font-size: 16px;
+        	font-weight: 300;
+        }
+        table{
+        	width: 100%;
+        	border-bottom: 2px solid #272088;
+        	border-top: 2px solid #272088;
+        }
+        thead{
+        	height: 65px;
+        	color: #272088;
+        	font-weight: 500;
+        	font-size: 20px;
+        }
+        thead th{
+        	border-bottom: 2px solid #272088;
+        }
+        tbody{
+        	font-weight: 400;
+        	font-size: 20px;
+        }
+        .row{
+        	text-align: center;
+        }
+        .row:nth-child(2n){
+        	background-color: #ebebeb;
+        }
+        button{
+			padding: 10px;
+			background-color: transparent;
+			color: #0077ff;
+			border: 1px solid #0077ff;
+			outline: none;
+			text-decoration: none;
+			border-radius: 5px ;
+			font-size: 20px;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all .4s ease;
+		}
+		button:hover{
+			background-color: #0077ff;
+			color: white;
+		}
+		.not-allow{
+			font-size: 48px;
+			font-weight: 700;
+			color: #272088;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+		#msg-form{
+			display: none;
+			width: 30%;
+			aspect-ratio: 1 / .6;
+			border: 1px solid #b4b4b4;
+			border-radius: 8px;
+			padding-bottom: 10px;
+		}
+		label{
+			width: 100%;
+			padding: 16px 8px;
+			font-size: 20px;
+			font-weight: 500;
+			background-color: #0077ff;
+			color: #ebb43f;
+			border-radius: 7px 7px 0 0;
+			text-align: center;
+		}
+		#msg{
+			width: 80%;
+			height: 30px;
+			padding: 5px;
+			border-radius: 5px;
+			border: 1px solid #b4b4b4;
+			outline: none;
+			color: #0077ff;
+		}
+		#msg:focus{
+			border-color: #0077ff;
+		}
+		#msg-btn{
+			padding: 8px 16px;
+			font-size: 14px;
+		}
+		.logo-show{
+			flex: .5;
+		}
+
+		@media(max-width: 1000px) {
+			label{
+				padding: 8px 4px;
+			}
+			#msg-btn{
+				padding: 4px 8px;
+			}
+			#msg-form{
+				width: 35%;
+				padding-bottom: 4px;
+			}
+		}
+
+        @media(max-width: 500px) {
+        	body{
+        		padding: 0;
+        	}
+        	.header{
+        		height: 152px;
+        	}
+        	.right-head{
+        		height: 150px;
+        	}
+        	.details{
+        		gap: 4px;
+        	}
+        	.logo{
+        		text-align: left;
+        	}
+        	.logo img{
+        		width: 150px;
+        	}
+        	.logo-show img{
+        		width: 100px;
+        		margin-top: 50%;
+        		transform: translateY(-50%);
+        	}
+        	h2{
+        		font-size: 20px;
+        	}
+        	span, p{
+        		font-size: 11px;
+        	}
+        	button{
+        		padding: 8px 4px;
+        		font-size: 11px;
+        	}
+        	tbody{
+        		font-size: 11px;
+        	}
+        	thead{
+        		height: 35px;
+        		font-size: 14px;
+        	}
+        	#msg-form{
+        		width: 40%;
+        		margin-right: 5px;
+        		gap: 4px;
+        	}
+        	#msg-btn{
+        		font-size: 10px;
+        		padding: 5px 10px;
+        	}
+        	#msg{
+        		height: 20px;
+        	}
+        	label{
+        		font-size: 10px;
+        	}
+        }
+	</style>
+	<title>UOK | Student</title>
+</head>
+<body>
+	<div id="modal">
+		<div id="popup">
+			<button id="close">&times;</button>
+			<div id="header"></div>
+			<div id="content"></div>
+		</div>
+	</div>
+	<div class="header">
+		<div class="logo">
+			<img src="/cropped-logo.jpg" alt="Logo">
+		</div>
+		<div class="right-head">
+			<div class="details">
+				<p>ID: <span id="id"></span></p>
+				<p>Name: <span id="name"></span></p>
+			</div>
+			<form id="msg-form">
+				<label htmlFor="msg">Send Message</label>
+				<input type="text" id="msg">
+				<button id="msg-btn">Send</button>
+			</form>
+			<button onclick="logout()">Logout</button>
+		</div>
+	</div>
+	<h2>Registered Courses</h2>
+	<table>
+		<thead>
+			<th>Course #</th>
+			<th>العنوان</th>
+			<th>فئة النظري</th>
+			<th>فئة العملي</th>
+			<th>القاعة</th>
+			<th>اليوم</th>
+			<th>الوقت</th>
+		</thead>
+		<tbody id="table"></tbody>
+	</table>
+	<h2>Your Grads</h2>
+	<table>
+		<thead id="marks-head"></thead>
+		<tbody id="marks"></tbody>
+	</table>
+	<script type="text/javascript">
+		const number = window.location.pathname.split('/').pop();
+		const ID = localStorage.getItem('ID');
+		const NAME = localStorage.getItem('NAME');
+		if (number === ID) {
+			const id = document.getElementById('id'),
+			name = document.getElementById('name'),
+			form = document.getElementById('msg-form'),
+			msg = document.getElementById('msg'),
+			logo = document.querySelector('.logo'),
+			table = document.getElementById('table'),
+			marks = document.getElementById('marks'),
+			marksHead = document.getElementById('marks-head'),
+			modal = document.getElementById('modal'),
+			closeBtn = document.getElementById('close'),
+			header = document.getElementById('header'),
+			content = document.getElementById('content');
+			window.onload = async () => {
+				marks.innerHTML = '';
+				table.innerHTML = '';
+				if (NAME) {
+					form.style.display = 'flex';
+					form.style.flexDirection = 'column';
+					form.style.alignItems = 'center';
+					form.style.justifyContent = 'space-between';
+					logo.classList.add('logo-show');
+					marksHead.innerHTML = '<th>Course #</th><th>العنوان</th><th>الدرجة (1)</th><th>الدرجة (2)</th><th>الدرجة (3)</th><th>الدرجة (4)</th><th>الدرجة </th><th>نسبة الغياب</th>';
+				} else {
+					form.style.display = 'none';
+					logo.classList.remove('logo-show');
+					marksHead.innerHTML = '<th>Course #</th><th>العنوان</th><th>الدرجة (1)</th><th>الدرجة (2)</th><th>الدرجة (3)</th><th>الدرجة (4)</th><th>الدرجة </th>';
+					const msgRes = await fetch(`/students/show-message/${number}`);
+					const msg = await msgRes.json();
+					if (msg && msgRes.status === 200) {
+						console.log(msg)
+						modal.style.display = 'block';
+						header.innerHTML = `
+						<h2>You have a message from<br>${msg.sender}</h2>`;
+						content.innerHTML = `<p>${msg.content}</p>
+						<p>${msg.time}</p>`;
+					}
+				}
+
+				const res = await fetch(`/students/details/${number}`);
+				const data = await res.json();
+				if (res.status === 200) {
+					id.innerText = data[0]["ID"];
+					name.innerText = data[0]["name"];
+					for (var i = data.length - 1; i >= 0; i--) {
+						table.innerHTML += `	
+						<tr class="row">
+							<td>${data[i]['courseId']}</td>
+							<td>${data[i]['courseTitle']}</td>
+							<td>${data[i]['lec']}</td>
+							<td>${data[i]['lab']}</td>
+							<td>${data[i]['hall']}</td>
+							<td>${data[i]['day']}</td>
+							<td>${data[i]['time']}</td>
+						</tr>`;
+						if (NAME) {
+							const attRes = await fetch('/advisors/attendance', {
+								headers: {
+									'content-type': 'application/json'
+								},
+								method: 'POST',
+								body: JSON.stringify({student: data[i]['ID'], course: data[i]['courseId']})
+							});
+							const attendRate = await attRes.json();
+							if (attRes === 500) {
+								alert(attendRate);
+							}
+							marks.innerHTML += `
+							<tr class="row">
+								<td>${data[i]['courseId']}</td>
+								<td>${data[i]['courseTitle']}</td>
+								<td>${data[i]['mark1']}</td>
+								<td>${data[i]['mark2']}</td>
+								<td>${data[i]['mark3']}</td>
+								<td>${data[i]['mark4']}</td>
+								<td>${data[i]['markf']}</td>
+								<td>${attendRate}</td>
+							</tr>`;
+						} else {
+							marks.innerHTML += `
+							<tr class="row">
+								<td>${data[i]['courseId']}</td>
+								<td>${data[i]['courseTitle']}</td>
+								<td>${data[i]['mark1']}</td>
+								<td>${data[i]['mark2']}</td>
+								<td>${data[i]['mark3']}</td>
+								<td>${data[i]['mark4']}</td>
+								<td>${data[i]['markf']}</td>
+							</tr>`;
+						}
+					}
+				} else {
+					document.body.innerHTML = `<h1 class="not-allow">${data}</h1>`;
+				}
+			};
+
+			form.onsubmit = async (e) => {
+				e.preventDefault();
+				const res = await fetch('/advisors/send-message', {
+					headers: {
+						'content-type': 'application/json'
+					},
+					method: 'POST',
+					body: JSON.stringify({
+						receiver: id.innerText,
+						sender: NAME,
+						content: msg.value
+					})
+				});
+				const data = await res.json();
+				alert(data);
+			};
+
+			closeBtn.onclick = async () => {
+				const res = await fetch(`/students/delete-message/${number}`, {
+					headers: {
+						'content-type': 'application/json'
+					},
+					method: 'DELETE'
+				});
+				const msg = await res.json();
+				alert(msg);
+				window.location.reload();
+			};
+
+			function logout(){
+				localStorage.clear();
+				window.location = '/';
+			}
+		} else {
+			document.body.innerHTML = '<h1 class="not-allow">You are Not Allowed!</h1>';
+		}
+	</script>
+</body>
+</html>

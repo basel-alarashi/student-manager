@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style type="text/css">
+		*{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        body{
+            max-width: 100vw;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            justify-content: start;
+            gap: 10px;
+            padding: 5px 20px;
+        }
+        .header{
+        	width: 100%;
+        	height: 202px;
+        	display: flex;
+        	align-items: start;
+        	border-bottom: 2px solid #272088;
+        }
+        .logo{
+        	flex: 1;
+        	text-align: center;
+        }
+        .logo img{
+        	width: 200px;
+        	aspect-ratio: 1 /1;
+        }
+        .right-head{
+        	height: 200px;
+        	flex: 1;
+        	display: flex;
+        	align-items: center;
+        	justify-content: space-between;
+        }
+        .details{
+        	display: flex;
+        	flex-direction: column;
+        	gap: 10px;
+        }
+        h2{
+        	font-size: 32px;
+        	font-weight: 500;
+        	color: #272088;
+        }
+        p{
+        	color: #272088;
+        	font-size: 20px;
+        	font-weight: 500;
+        }
+        span{
+        	color: #0094ff;
+        	font-size: 20px;
+        	font-weight: 300;
+        }
+        table{
+        	width: 100%;
+        	border-bottom: 2px solid #272088;
+        	border-top: 2px solid #272088;
+        }
+        thead{
+        	height: 65px;
+        	color: #272088;
+        	font-weight: 500;
+        	font-size: 20px;
+        }
+        thead th{
+        	border-bottom: 2px solid #272088;
+        }
+        tbody{
+        	font-weight: 400;
+        	font-size: 20px;
+        }
+        .row{
+        	text-align: center;
+        }
+        .row:nth-child(2n){
+        	background-color: #ebebeb;
+        }
+        button{
+			padding: 10px;
+			background-color: transparent;
+			color: #0077ff;
+			border: 1px solid #0077ff;
+			outline: none;
+			text-decoration: none;
+			border-radius: 5px ;
+			font-size: 20px;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all .4s ease;
+		}
+		button:hover{
+			background-color: #0077ff;
+			color: white;
+		}
+		.flex{
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin-left: 50%;
+			transform: translateX(-50%);
+		}
+		.btn{
+			background-color: #ebb43f;
+			color: white;
+			border: 1px solid transparent;
+		}
+		.btn:hover{
+			color: #ebb43f;
+			border-color: #ebb43f;
+			background-color: white;
+		}
+		.not-allow{
+			font-size: 48px;
+			font-weight: 700;
+			color: #272088;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+		input{
+			padding: 5px;
+			width: 95%;
+			height: 95%;
+			border: none;
+			outline: none;
+			border-radius: 5px;
+			background-color: transparent;
+			text-align: center;
+			font-size: 20px;
+		}
+		input:hover{
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+		}
+		input:focus{
+			border: 1px solid #272088;
+		}
+
+        @media(max-width: 500px) {
+        	body{
+        		padding: 0;
+        	}
+        	.header{
+        		height: 152px;
+        	}
+        	.right-head{
+        		height: 150px;
+        	}
+        	.logo{
+        		text-align: left;
+        	}
+        	.logo img{
+        		width: 150px;
+        	}
+        	h2{
+        		font-size: 20px;
+        	}
+        	tbody, input, span, p, button{
+        		font-size: 12px;
+        	}
+        	thead{
+        		width: 100%;
+        		height: 35px;
+        		font-size: 14px;
+        	}
+        }
+	</style>
+	<title>UOK | Course</title>
+</head>
+<body>
+	<div class="header">
+		<div class="logo">
+			<img src="/cropped-logo.jpg" alt="Logo">
+		</div>
+		<div class="right-head">
+			<div class="details">
+				<p>Course #: <span id="id"></span></p>
+				<p>Title: <span id="title"></span></p>
+			</div>
+			<button onclick="logout()">Logout</button>
+		</div>
+	</div>
+	<h2>Course Students</h2>
+	<table>
+		<thead>
+			<th>Student #</th>
+			<th>اسم الطالب</th>
+			<th>فئة النظري</th>
+			<th>فئة العملي</th>
+			<th>الدرجة (1)</th>
+			<th>الدرجة (2)</th>
+			<th>الدرجة (3)</th>
+			<th>الدرجة (4)</th>
+			<th>المعدل</th>
+		</thead>
+		<tbody id="table"></tbody>
+	</table>
+	<div class="flex">
+		<button class="btn" id="marks">Apply Changes</button>
+	</div>
+	<h2>Attendance & Absence</h2>
+	<table>
+		<thead>
+			<th>Student #</th>
+			<th style="width: 20%;">الاسم</th>
+			<th>1</th>
+			<th>2</th>
+			<th>3</th>
+			<th>4</th>
+			<th>5</th>
+			<th>6</th>
+			<th>7</th>
+			<th>8</th>
+			<th>9</th>
+			<th>10</th>
+			<th>11</th>
+			<th>12</th>
+			<th>13</th>
+			<th>14</th>
+			<th>15</th>
+		</thead>
+		<tbody id="attend"></tbody>
+	</table>
+	<div class="flex">
+		<button class="btn" id="addRow">Add Row</button>
+		<button class="btn" id="attendance">Apply Changes</button>
+	</div>
+	<script type="text/javascript">
+		const course = decodeURIComponent(window.location.pathname.split('/').pop());
+		const NAME = localStorage.getItem('NAME');
+		if (NAME) {
+			const marksBtn = document.getElementById('marks'),
+			attendBtn = document.getElementById('attendance'),
+			addRow = document.getElementById('addRow'),
+			courseId = document.getElementById('id'),
+			title = document.getElementById('title'),
+			table = document.getElementById('table');
+			table.innerHTML = '';
+			attend = document.getElementById('attend');
+			attend.innerHTML = '';
+			window.onload = async () => {
+				const studentRes = await fetch(`/doctors/courses/${course}`);
+				const studentData = await studentRes.json();
+
+				let students = [];
+				courseId.innerText = studentData[0]['Course #'];
+				title.innerText = studentData[0][Object.keys(studentData[0])[0]];
+
+				for (var i = 0; i < studentData.length; i++) {
+					students.push({
+						id: studentData[i]['ID'],
+						name: studentData[i]['الاسم']
+					});
+					table.innerHTML += `
+					<tr class="row">
+						<td id="${i}-id">${studentData[i]['ID']}</td>
+						<td>${studentData[i]['الاسم']}</td>
+						<td>${studentData[i]['Lec #']}</td>
+						<td>${studentData[i]['Lab #']}</td>
+						<td><input type="text" id="${i}-1" value="${studentData[i]['الدرجة (1)']}"></td>
+						<td><input type="text" id="${i}-2" value="${studentData[i]['الدرجة (2)']}"></td>
+						<td><input type="text" id="${i}-3" value="${studentData[i]['الدرجة (3)']}"></td>
+						<td><input type="text" id="${i}-4" value="${studentData[i]['الدرجة (4)']}"></td>
+						<td><input type="text" id="${i}-f" value="${studentData[i]['المعدل']}"></td>
+					</tr>`;
+				}
+
+				const attendRes = await fetch(`/doctors/attendance/${course}`, {
+					headers: {
+						'content-type': 'application/json'
+					},
+					method: 'POST',
+					body: JSON.stringify(students)
+				});
+				const attendData = await attendRes.json();
+
+				for (var i = attendData.length - 1; i >= 0; i--) {
+					console.log(Object.keys(attendData[i]));
+					const row = attend.insertRow(0);
+					row.classList.add('row');
+					let cell15 = row.insertCell(0);
+					cell15.innerHTML = `<input type="text" value="${attendData[i]['15']}" id="att-${i}-15">`;
+					let cell14 = row.insertCell(0);
+					cell14.innerHTML = `<input type="text" value="${attendData[i]['14']}" id="att-${i}-14">`;
+					let cell13 = row.insertCell(0);
+					cell13.innerHTML = `<input type="text" value="${attendData[i]['13']}" id="att-${i}-13">`;
+					let cell12 = row.insertCell(0);
+					cell12.innerHTML = `<input type="text" value="${attendData[i]['12']}" id="att-${i}-12">`;
+					let cell11 = row.insertCell(0);
+					cell11.innerHTML = `<input type="text" value="${attendData[i]['11']}" id="att-${i}-11">`;
+					let cell10 = row.insertCell(0);
+					cell10.innerHTML = `<input type="text" value="${attendData[i]['10']}" id="att-${i}-10">`;
+					let cell9 = row.insertCell(0);
+					cell9.innerHTML = `<input type="text" value="${attendData[i]['9']}" id="att-${i}-9">`;
+					let cell8 = row.insertCell(0);
+					cell8.innerHTML = `<input type="text" value="${attendData[i]['8']}" id="att-${i}-8">`;
+					let cell7 = row.insertCell(0);
+					cell7.innerHTML = `<input type="text" value="${attendData[i]['7']}" id="att-${i}-7">`;
+					let cell6 = row.insertCell(0);
+					cell6.innerHTML = `<input type="text" value="${attendData[i]['6']}" id="att-${i}-6">`;
+					let cell5 = row.insertCell(0);
+					cell5.innerHTML = `<input type="text" value="${attendData[i]['5']}" id="att-${i}-5">`;
+					let cell4 = row.insertCell(0);
+					cell4.innerHTML = `<input type="text" value="${attendData[i]['4']}" id="att-${i}-4">`;
+					let cell3 = row.insertCell(0);
+					cell3.innerHTML = `<input type="text" value="${attendData[i]['3']}" id="att-${i}-3">`;
+					let cell2 = row.insertCell(0);
+					cell2.innerHTML = `<input type="text" value="${attendData[i]['2']}" id="att-${i}-2">`;
+					let cell1 = row.insertCell(0);
+					cell1.innerHTML = `<input type="text" value="${attendData[i][Object.keys(attendData[i])[14]]}" id="att-${i}-1">`;
+					let cellName = row.insertCell(0);
+					cellName.innerHTML = `<input type="text" value="${attendData[i]['الاسم']}" id="att-${i}-name">`;
+					let cellId = row.insertCell(0);
+					cellId.innerHTML = `<input type="text" value="${attendData[i]['الرقم']}" id="att-${i}-id">`;
+				}
+			};
+
+			function logout(){
+				localStorage.clear();
+				window.location = '/';
+			}
+
+			addRow.onclick = () => {
+				count = attend.children.length;
+				const row = attend.insertRow(count);
+				row.classList.add('row');
+				for (var i = 15; i > 0; i--) {
+					let cell = row.insertCell(0);
+					cell.innerHTML = `<input type="text" value="" id="att-${count}-${i}">`;
+				}
+				let cellName = row.insertCell(0);
+				cellName.innerHTML = `<input type="text" value="" id="att-${count}-name">`;
+				let cellId = row.insertCell(0);
+				cellId.innerHTML = `<input type="text" id="att-${count}-id">`;
+				window.scroll({
+					top: document.body.scrollHeight,
+					behavior: 'smooth'
+				});
+			};
+
+			marksBtn.onclick = async () => {
+				const rows = [];
+				for (var i = 0; i < table.children.length; i++) {
+					let id = document.getElementById(`${i}-id`),
+					input1 = document.getElementById(`${i}-1`),
+					input2 = document.getElementById(`${i}-2`),
+					input3 = document.getElementById(`${i}-3`),
+					input4 = document.getElementById(`${i}-4`),
+					inputf = document.getElementById(`${i}-f`);
+					rows.push({
+						id: id.innerText,
+						mark1: input1.value,
+						mark2: input2.value,
+						mark3: input3.value,
+						mark4: input4.value,
+						markf: inputf.value,
+					});
+				}
+				const res = await fetch('/doctors/write-marks', {
+					headers: {
+						'content-type': 'application/json'
+					},
+					method: 'POST',
+					body: JSON.stringify({course: course, rows: rows})
+				});
+				const data = await res.json();
+				alert(data);
+			};
+
+			attendBtn.onclick = async () => {
+				const rows = [];
+				for (var i = 0; i < attend.children.length; i++){
+					let attId = document.getElementById(`att-${i}-id`),
+					attName = document.getElementById(`att-${i}-name`),
+					att1 = document.getElementById(`att-${i}-1`),
+					att2 = document.getElementById(`att-${i}-2`),
+					att3 = document.getElementById(`att-${i}-3`),
+					att4 = document.getElementById(`att-${i}-4`),
+					att5 = document.getElementById(`att-${i}-5`),
+					att6 = document.getElementById(`att-${i}-6`),
+					att7 = document.getElementById(`att-${i}-7`),
+					att8 = document.getElementById(`att-${i}-8`),
+					att9 = document.getElementById(`att-${i}-9`),
+					att10 = document.getElementById(`att-${i}-10`),
+					att11 = document.getElementById(`att-${i}-11`),
+					att12 = document.getElementById(`att-${i}-12`),
+					att13 = document.getElementById(`att-${i}-13`),
+					att14 = document.getElementById(`att-${i}-14`),
+					att15 = document.getElementById(`att-${i}-15`);
+					rows.push({
+						'1': att1.value,
+						'2': att2.value,
+						'3': att3.value,
+						'4': att4.value,
+						'5': att5.value,
+						'6': att6.value,
+						'7': att7.value,
+						'8': att8.value,
+						'9': att9.value,
+						'10': att10.value,
+						'11': att11.value,
+						'12': att12.value,
+						'13': att13.value,
+						'14': att14.value,
+						'15': att15.value,
+						'الرقم': attId.value,
+						'الاسم': attName.value,
+					});
+				}
+				const res = await fetch('/doctors/write-attends', {
+					headers: {
+						'content-type': 'application/json'
+					},
+					method: 'POST',
+					body: JSON.stringify({course: course, rows: rows})
+				});
+				const data = await res.json();
+				alert(data);
+			};
+		} else {
+			document.body.innerHTML = `<h1 class="not-allow">
+			You are Not Allowed!</h1>`;
+		}
+	</script>
+</body>
+</html>
