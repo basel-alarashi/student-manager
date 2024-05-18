@@ -146,6 +146,60 @@
 		input:focus{
 			border: 1px solid #272088;
 		}
+		#msg-form{
+			display: none;
+			flex-direction: column;
+			align-items: center;
+			justify-content: space-between;
+			width: 50%;
+			position: fixed;
+			left: 50%;
+			transform: translateX(-50%);
+			aspect-ratio: 1 / .3;
+			border: 1px solid #b4b4b4;
+			border-radius: 8px;
+			padding-bottom: 10px;
+			background-color: white;
+			animation: show .4s linear backwards;
+		}
+		label{
+			width: 100%;
+			padding: 16px 8px;
+			font-size: 20px;
+			font-weight: 500;
+			background-color: #0077ff;
+			color: #ebb43f;
+			border-radius: 7px 7px 0 0;
+			text-align: center;
+		}
+		#msg, #rate{
+			width: 80%;
+			height: 30px;
+			padding: 5px;
+			border-radius: 5px;
+			border: 1px solid #b4b4b4;
+			outline: none;
+			color: #0077ff;
+		}
+		#msg:focus, #rate:focus{
+			border-color: #0077ff;
+		}
+		#rate{
+			width: 60%;
+		}
+		#msg-btn{
+			padding: 8px 16px;
+			font-size: 14px;
+		}
+
+		@keyframes show {
+			0%{
+				top: -30%;
+			}
+			100%{
+				top: 5px;
+			}
+		}
 
         @media(max-width: 500px) {
         	body{
@@ -179,6 +233,19 @@
 	<title>UOK | Course</title>
 </head>
 <body>
+	<form id="msg-form" onsubmit="(e) => e.preventDefault()">
+		<label htmlFor="msg">Send Message</label>
+		<input type="text" id="msg">
+		<div style="width: 80%;display: flex; align-items: center; justify-content: space-between;">
+			<p>Rate:</p>
+			<input type="number" id="rate">
+		</div>
+		<div style="display: flex; align-items: center; gap: 20px;">
+			<button type="submit" id="msg-btn">Send</button>
+			<button style="padding: 8px 16px; font-size: 14px;"
+			class="btn" onclick="cancel()" type="button">Cancel</button>
+		</div>
+	</form>
 	<div class="header">
 		<div class="logo">
 			<img src="/cropped-logo.jpg" alt="Logo">
@@ -203,6 +270,7 @@
 			<th>الدرجة (3)</th>
 			<th>الدرجة (4)</th>
 			<th>المعدل</th>
+			<th>إرسال رسالة</th>
 		</thead>
 		<tbody id="table"></tbody>
 	</table>
@@ -325,6 +393,36 @@
 					cellId.innerHTML = `<input type="text" value="${attendData[i]['الرقم']}" id="att-${i}-id">`;
 				}
 			};
+
+			function sendMessage(studentName){
+				const form = document.getElementById('msg-form'),
+				btn = document.getElementById('msg-btn'),
+				rate = document.getElementById('rate'),
+				field = document.getElementById('msg');
+				btn.onclick = async () => {
+					const msgRes = await fetch('/advisors/send-message', {
+						headers: {
+							'Content-type': 'application/json'
+						},
+						method: 'POST',
+						body: JSON.stringify({
+							content: field.value,
+							sender: NAME,
+							receiver: studentName,
+							rate: rate.value
+						})
+					}),
+					msgData = await msgRes.json();
+					alert(msgData);
+					window.location.reload();
+				};
+				form.style.display = 'flex';
+			}
+
+			function cancel(){
+				const form = document.getElementById('msg-form');
+				form.style.display = 'none';
+			}
 
 			function logout(){
 				localStorage.clear();
