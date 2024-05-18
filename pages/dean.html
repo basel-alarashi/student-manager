@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>UOK | Dean</title>
+	<style type="text/css">
+		*{
+			padding: 0;
+			margin: 0;
+			box-sizing: border-box;
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+		}
+		body{
+			max-width: 100vw;
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			align-items: start;
+			justify-content: start;
+			gap: 10px;
+			padding: 5px 20px;
+		}
+		.header{
+			width: 100%;
+			height: 202px;
+			display: flex;
+			align-items: start;
+			border-bottom: 2px solid #272088;
+		}
+		.logo{
+			flex: 1;
+			text-align: center;
+		}
+		.logo img{
+			width: 200px;
+			aspect-ratio: 1 /1;
+		}
+		.right-head{
+			height: 200px;
+			flex: 1;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+		.details{
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+		h2{
+			font-size: 32px;
+			font-weight: 500;
+			color: #272088;
+		}
+		p{
+			color: #272088;
+			font-size: 20px;
+			font-weight: 500;
+		}
+		span{
+			color: #0094ff;
+			font-size: 20px;
+			font-weight: 300;
+		}
+		a{
+			color: #0094ff;
+			font-weight: 400;
+			text-decoration: none;
+		}
+		a:hover{
+			text-decoration: underline;
+		}
+		table{
+			display: none;
+			width: 100%;
+			border-bottom: 2px solid #272088;
+			border-top: 2px solid #272088;
+		}
+		thead{
+			height: 65px;
+			color: #272088;
+			font-weight: 500;
+			font-size: 20px;
+		}
+		thead th{
+			border-bottom: 2px solid #272088;
+		}
+		tbody{
+			font-weight: 400;
+			font-size: 20px;
+		}
+		.row{
+			text-align: center;
+		}
+		.row:nth-child(2n){
+			background-color: #ebebeb;
+		}
+		button{
+			padding: 10px;
+			background-color: transparent;
+			color: #0077ff;
+			border: 1px solid #0077ff;
+			outline: none;
+			text-decoration: none;
+			border-radius: 5px ;
+			font-size: 20px;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all .4s ease;
+		}
+		button:hover{
+			background-color: #0077ff;
+			color: white;
+		}
+		.not-allow{
+			font-size: 48px;
+			font-weight: 700;
+			color: #272088;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+		.show{
+			padding: 5px 0;
+			width: 75px;
+			border-width: 2px;
+			background-color: #AEA8BA;
+			border-color: #585263;
+			color: #585263;
+		}
+		.show:hover{
+			background-color: #585263;
+			color: #AEA8BA;
+			border-color: #AEA8BA;
+		}
+		#deprivation{
+			display: none;
+			margin-top: 10px;
+			margin-left: 50%;
+			padding: 10px;
+			transform: translateX(-50%);
+			width: 50%;
+			height: 100px;
+			flex-direction: column;
+			align-items: center;
+			justify-content: space-between;
+			background-color: #e4e4e4;
+			border: 2px solid #272088;
+			border-radius: 8px;
+			padding-bottom: 10px;
+		}
+		#rate{
+			width: 60%;
+			height: 30px;
+			padding: 5px;
+			border-radius: 5px;
+			border: 1px solid #b4b4b4;
+			outline: none;
+			color: #272088;
+		}
+		#rate:focus{
+			border-color: #272088;
+		}
+		#rate-btn{
+			padding: 8px 16px;
+			font-size: 14px;
+			border-color: #272088;
+			color: #272088;
+		}
+		#rate-btn:hover{
+			background-color: #272088;
+			border-color: #e4e4e4;
+			color: #e4e4e4;
+		}
+		#deprivated{
+			display: none;
+			position: relative;
+			width: 30%;
+			margin-left: 50%;
+			transform: translateX(-50%);
+			padding: 5px 5px 5px 30px;
+			border: 2px solid #272088;
+			border-radius: 4px;
+			user-select: none;
+		}
+		#deprivated li{
+			width: 100%;
+			height: 32px;
+			vertical-align: bottom;
+			padding-left: 5px;
+			color: #272088;
+			font-weight: 500;
+		}
+		#deprivated li:nth-child(even){
+			color: #ebb43f;
+		}
+		#deprivated hr{
+			position: absolute;
+			right: 0;
+			width: 100%;
+			border: none;
+			outline: none;
+			height: 1px;
+			background-color: #b4b4b4;
+		}
+
+		@media(max-width: 500px) {
+			body{
+				padding: 0;
+			}
+			.header{
+				height: 152px;
+			}
+			.right-head{
+				height: 150px;
+			}
+			.logo{
+				text-align: left;
+			}
+			.logo img{
+				width: 150px;
+			}
+			h2{
+				font-size: 20px;
+			}
+			span, p, button{
+				font-size: 12px;
+			}
+			tbody{
+				font-size: 12px;
+			}
+			thead{
+				height: 35px;
+				font-size: 14px;
+			}
+		}
+		</style>
+</head>
+<body>
+	<div class="header">
+		<div class="logo">
+			<img src="/cropped-logo.jpg" alt="Logo">
+		</div>
+		<div class="right-head">
+			<div class="details">
+				<p>Name: <span id="name"></span></p>
+				<p>Faculty: <span id="faculty"></span></p>
+			</div>
+			<button onclick="logout()">Logout</button>
+		</div>
+	</div>
+	<div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+		<h2>Your Courses</h2>
+		<button class="show" onclick="show(this, 'courses')">Show</button>
+	</div>
+	<table id="courses">
+		<thead>
+			<th>Course #</th>
+			<th>المادة</th>
+			<th>القسم</th>
+			<th>القاعة</th>
+			<th>الشعبة</th>
+			<th>اليوم</th>
+			<th>الوقت</th>
+		</thead>
+		<tbody id="table"></tbody>
+	</table>
+	<div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+		<h2>Department Messages </h2>
+		<button class="show" onclick="show(this, 'messages')">Show</button>
+	</div>
+	<table id="messages">
+		<thead>
+			<th>Message #</th>
+			<th>Content</th>
+			<th>Sender</th>
+			<th>Receiver</th>
+			<th>Time</th>
+			<th>Rate</th>
+			<th>Shown</th>
+		</thead>
+		<tbody id="msg-table"></tbody>
+	</table>
+	<div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+		<h2>Students Data</h2>
+		<button class="show" onclick="show(this, 'students')">Show</button>
+	</div>
+	<table id="students">
+		<thead>
+			<th>Student #</th>
+			<th>الاسم</th>
+			<th>المرشد</th>
+			<th>الاختصاص</th>
+			<th>عدد الساعات المنجزة</th>
+			<th>عدد الساعات المسجلة</th>
+			<th>عدد الساعات المتبقية</th>
+			<th>المعدل</th>
+		</thead>
+		<tbody id="students-table"></tbody>
+	</table>
+	<div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+		<h2>Deprivation</h2>
+		<button class="show" onclick="showForm(this)">Show</button>
+	</div>
+	<form id="deprivation">
+		<div style="width: 80%;display: flex; align-items: center; justify-content: space-between;">
+			<p>Rate:</p>
+			<input type="number" id="rate">
+		</div>
+		<button id="rate-btn" type="submit">Send</button>
+	</form>
+	<ol id="deprivated">
+		<li>First</li><hr>
+		<li>First</li><hr>
+		<li>First</li><hr>
+		<li>First</li><hr>
+		<li>First</li><hr>
+		<li>First</li><hr>
+		<li>First</li><hr>
+	</ol>
+	<script type="text/javascript">
+		window.onload = async () => {
+			const DEAN = localStorage.getItem('DEAN');
+			if (DEAN === 'احسان النجار') {
+				const username = document.getElementById('name'),
+				faculty = document.getElementById('faculty'),
+				deprivationForm = document.getElementById('deprivation'),
+				table = document.getElementById('table'),
+				studentsTable = document.getElementById('students-table'),
+				msgTable = document.getElementById('msg-table');
+				table.innerHTML = '';
+				msgTable.innerHTML = '';
+				studentsTable.innerHTML = '';
+
+				deprivationForm.onsubmit = async (e) => {
+					e.preventDefault();
+					const list = document.getElementById('deprivated'),
+					rate = document.getElementById('rate');
+					list.innerHTML = '';
+					const res = await fetch('/students/dean-deprivation', {
+						headers: {
+							'Content-type': 'application/json'
+						},
+						method: 'POST',
+						body: JSON.stringify({ rate: rate.value })
+					}),
+					data = await res.json();
+
+					if (data && data.length > 0) {
+						list.style.display = 'block';
+						for (var i = data.length - 1; i >= 0; i--) {
+							list.innerHTML += `<li>${data[i]}</li><hr>`;
+						}
+					}
+				};
+
+				const res = await fetch(`/doctors/details/${DEAN}`);
+				const data = await res.json();
+
+				if (data) {
+					username.innerText = data[0]['المدرس'];
+					faculty.innerText = data[0]['الكلية'];
+					for (var i = data.length - 1; i >= 0; i--) {
+						table.innerHTML += `
+							<tr class="row">
+								<td>${data[i][Object.keys(data[0])[0]]}</td>
+								<td><a href="/doctors/course/${data[i][Object.keys(data[0])[0]]}">
+									${data[i]['المادة']}</a></td>
+								<td>${data[i]['مخبر']}</td>
+								<td>${data[i]['القاعة']}</td>
+								<td>${data[i]['الشعبة']}</td>
+								<td>${data[i]['اليوم']}</td>
+								<td>${data[i]['التوقيت']}</td>
+							</tr>`;
+					}
+				}
+
+				const msgRes = await fetch('/students/dean-messages');
+				const msgData = await msgRes.json();
+
+				if (msgData) {
+					for (var i = msgData.length - 1; i >= 0; i--) {
+						msgTable.innerHTML += `
+							<tr class="row">
+								<td>${msgData[i]['id']}</td>
+								<td>${msgData[i]['content']}</td>
+								<td>${msgData[i]['sender']}</td>
+								<td>${msgData[i]['receiver']}</td>
+								<td>${msgData[i]['time']}</td>
+								<td>${msgData[i]['rate']}</td>
+								<td>${msgData[i]['shown'] === 1? 'Yes': 'No'}</td>
+							</tr>`;
+					}
+				}
+
+				const studentsRes = await fetch('/students/head-data/');
+				const studentsData = await studentsRes.json();
+
+				if (studentsData) {
+					for (var i = studentsData.length - 1; i >= 0; i--) {
+						studentsTable.innerHTML += `
+							<tr class="row">
+								<td>${studentsData[i]['ID']}</td>
+								<td>${studentsData[i]['الاسم']}</td>
+								<td>${studentsData[i]['المرشد']}</td>
+								<td>${studentsData[i][Object.keys(studentsData[0])[0]]}</td>
+								<td>${studentsData[i]['Cum Pass Crd']}</td>
+								<td>${studentsData[i]['Sem Reg Crd']}</td>
+								<td>${studentsData[i]['remainHours']}</td>
+								<td>${studentsData[i]['Cum Gpa']}</td>
+							</tr>`;
+					}
+				}
+			} else {
+				document.body.innerHTML = `<h1 class="not-allow">
+				You are Not Allowed!</h1>`;
+			}
+		};
+
+		function show(e, id){
+			const element = document.getElementById(id),
+			style = document.defaultView.getComputedStyle(element),
+			newDisplay = style.display === 'table'? 'none': 'table',
+			newText = e.innerText === 'Hide'? 'Show': 'Hide';
+
+			element.style.display = newDisplay;
+			e.innerText = newText;
+		}
+
+		const showForm = (e) => {
+			const form = document.getElementById('deprivation'),
+			style = document.defaultView.getComputedStyle(form),
+			newDisplay = style.display === 'flex'? 'none': 'flex',
+			newText = e.innerText === 'Hide'? 'Show': 'Hide';
+
+			form.style.display = newDisplay;
+			e.innerText = newText;
+		};
+
+		function logout(){
+			localStorage.clear();
+			window.location = '/';
+		}
+	</script>
+</body>
+</html>
