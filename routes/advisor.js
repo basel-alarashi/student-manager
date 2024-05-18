@@ -7,19 +7,7 @@ const db = new sqlite.Database('db.sqlite3', (err) => {
 	if (err) {
 		console.log(err.message);
 	} else {
-		db.run(`CREATE TABLE IF NOT EXISTS message (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			content VARCHAR(255),
-			sender VARCHAR(63),
-			receiver VARCHAR(30),
-			time TEXT DEFAULT CURRENT_TIMESTAMP
-		)`, (error) => {
-			if (error) {
-				console.log(error.message);
-			} else {
-				console.log('Connected.');
-			}
-		});
+		console.log('[ADVISOR] Connected.');
 	}
 });
 
@@ -62,8 +50,8 @@ router.get('/details/:name', async (req, res) => {
 	let advisors = [];
 	for (var i = advisorData.length - 1; i >= 0; i--) {
 		if (advisorData[i]['المرشد'] === req.params.name) {
-			delete advisorData[i]['Password'];
-			advisors.push(advisorData[i]);
+			const { Password: password, ...advisor } = advisorData[i];
+			advisors.push(advisor);
 		}
 	}
 	res.status(200).json(advisors);
@@ -79,18 +67,8 @@ router.post('/attendance', (req, res) => {
 					data = d3.csvParse(data);
 					let rate = 0;
 					for (var i = data.length - 1; i >= 0; i--) {
-						if (data[i]['الرقم'] === req.body.student) {
-							for (var j = Object.keys(data[i]).length - 1; j >= 0; j--) {
-								if (data[i][j] === 'غ') {
-									rate += 6;
-								} else if (data[i][j] === 'ن') {
-									rate += 4;
-								} else if (data[i][j] === 'ع') {
-									rate += 2;
-								} else if (data[i][j] === 'ب') {
-									rate += 3;
-								}
-							}
+						if (data[i][Object.keys(data[i])[0]] === req.body.student) {
+							rate = data[i]['النسبة'];
 						}
 					}
 					res.status(200).json(rate);
@@ -100,14 +78,69 @@ router.post('/attendance', (req, res) => {
 });
 
 router.post('/send-message', (req, res) => {
-	db.run(`INSERT INTO message (content, sender, receiver) VALUES (
-		'${req.body.content}', '${req.body.sender}', '${req.body.receiver}')`,
+	db.run(`INSERT INTO message (content, sender, receiver, rate) VALUES (
+		'${req.body.content}', '${req.body.sender}',
+		'${req.body.receiver}', '${req.body.rate}')`,
 		(err) => {
 		if (err) {
 			res.status(500).json(err.message);
 		} else {
 			res.status(200).json('Message has been sent.');
 		}
+	});
+});
+
+router.get('/show-message/:name', (req, res) => {
+	db.get(`SELECT * FROM message WHERE receiver='${req.params.name}'
+		AND shown=FALSE`,
+		(err, row) => {
+			if (err) {
+				res.status(500).json(err.message);
+			} else if (row) {
+				res.status(200).json(row);
+			} else {
+				res.status(200).json('No messages');
+			}
+		});
+});
+
+router.get('/hide-message/:msgId', (req, res) => {
+	db.run(`UPDATE message SET shown=TRUE WHERE
+		id='${req.params.msgId}'`,
+		(err) => {
+			if (err) {
+				res.status(500).json(err.message);
+			} else {
+				res.status(200).json('Message ended.');
+			}
+		});
+});
+
+router.get('/availability/:name', (req, res) => {
+	d3_module.then((d3) => {
+		fs.readFile(`./requirement/availability/${req.params.name}.csv`,
+			'utf-8', (err, data) => {
+			if (err) {
+				res.status(500).json(err.message);
+			} else {
+				data = d3.csvParse(data);
+				res.status(200).json(data);
+			}
+		});
+	});
+});
+
+router.post('/write-availability', (req, res) => {
+	d3_module.then((d3) => {
+		const data = d3.csvFormat(req.body.data);
+		fs.writeFile(`./requirement/availability/${req.body.name}.csv`,
+			data, 'utf-8', (err) => {
+				if (err) {
+					res.status(500).json(err.message);
+				} else {
+					res.status(200).json('Changes applied successfully.');
+				}
+			});
 	});
 });
 
