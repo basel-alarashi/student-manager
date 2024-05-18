@@ -138,11 +138,21 @@
 			});
 			const msg = await res.json();
 			if (res.status === 202) {
-				let dist = '/' + url.split('/')[1];
-				dist += dist.substring(0, dist.length -1) + '/' + doctor.name;
-				alert(msg);
-				localStorage.setItem('NAME', doctor.name);
-				window.location = dist;
+				if (doctor.name === 'قصي بنشي') {
+					alert('Welcome Mr.' + doctor.name);
+					localStorage.setItem('HEAD', doctor.name);
+					window.location = '/head';
+				} else if (doctor.name === 'احسان النجار') {
+					alert('Welcome Mr.' + doctor.name);
+					localStorage.setItem('DEAN', doctor.name);
+					window.location = '/dean';
+				} else {
+					let dist = '/' + url.split('/')[1];
+					dist += dist.substring(0, dist.length -1) + '/' + doctor.name;
+					alert(msg);
+					localStorage.setItem('NAME', doctor.name);
+					window.location = dist;
+				}
 			} else {
 				alert(msg);
 				window.location.reload();

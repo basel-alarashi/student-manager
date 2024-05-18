@@ -17,7 +17,7 @@
             display: flex;
             align-items: start;
             justify-content: start;
-            gap: 5rem;
+            gap: 2vw;
         }
         .container{
         	display: flex;
@@ -42,7 +42,7 @@
         	display: flex;
         	align-items: center;
         	justify-content: center;
-        	gap: 20px;
+        	gap: 1vw;
         }
         a{
         	background-color: #ebb43f;
@@ -65,6 +65,36 @@
         	background-color: white;
         	color: #ebb43f;
         }
+
+        @media (max-width: 1000px) {
+            a{
+                font-size: 17px;
+            }
+            img{
+                width: 200px;
+            }
+        }
+        @media (max-width: 800px) {
+            body{
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            img{
+                object-view-box: inset(2% 2% 2% 2%);
+            }
+        }
+        @media (max-width: 600px) {
+            a{
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+        @media (max-width: 425px) {
+            .btn{
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
@@ -73,6 +103,8 @@
         <h1>welcom</h1>
 		<p>please choose your role</p>
 		<div class="btn">
+            <a href="/doctors/login">dean</a>
+            <a href="/doctors/login">head</a>
 			<a href="/doctors/login">doctor</a>
 			<a href="/doctors/login">advisor</a>
 			<a href="/students/login">student</a>

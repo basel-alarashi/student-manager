@@ -20,6 +20,63 @@
             gap: 10px;
             padding: 5px 20px;
         }
+        #modal{
+        	display: none;
+        	position: fixed;
+        	top: 0;
+        	left: 0;
+        	width: 100%;
+        	height: 100%;
+        	background-color: rgba(0, 0, 0, .5);
+        	z-index: 1;
+        }
+        #popup{
+        	background-color: white;
+        	width: 50%;
+        	margin: auto;
+        	border: 1px solid #b4b4b4;
+        	border-radius: 10px;
+        	position: relative;
+        	transform: translateY(75%);
+        	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, .4), 0 6px 20px 0 rgba(0, 0, 0, .4);
+        	animation-name: modal-zoom;
+			animation-duration: .4s;
+        }
+        #close{
+        	padding: 0;
+        	position: absolute;
+        	right: 10px;
+        	top: 5px;
+        	border: none;
+        	font-size: 24px;
+        	font-weight: 500;
+        	color: #ebb43f;
+        }
+        #close:hover{
+        	background-color: transparent;
+        	color: white;
+        }
+        #header{
+        	padding: 20px;
+        	background-color: #272088;
+        	border-radius: 10px 10px 0 0;
+        	text-align: center;
+        }
+        #header h2{
+        	color: #ebb43f;
+        }
+        #content{
+        	display: flex;
+        	flex-direction: column;
+        	align-items: center;
+        	gap: 15px;
+        	padding: 20px;
+        	color: #272088;
+        }
+        #content p{
+        	font-size: 20px;
+        	font-weight: 500;
+        }
         .header{
         	width: 100%;
         	height: 202px;
@@ -120,6 +177,40 @@
 			left: 50%;
 			transform: translate(-50%, -50%);
 		}
+		input{
+			padding: 5px;
+			width: 95%;
+			height: 95%;
+			border: none;
+			outline: none;
+			border-radius: 5px;
+			background-color: transparent;
+			text-align: center;
+			font-size: 20px;
+		}
+		input:hover{
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+		}
+		input:focus{
+			border: 1px solid #272088;
+		}
+		.flex{
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin-left: 50%;
+			transform: translateX(-50%);
+		}
+		.btn{
+			background-color: #ebb43f;
+			color: white;
+			border: 1px solid transparent;
+		}
+		.btn:hover{
+			color: #ebb43f;
+			border-color: #ebb43f;
+			background-color: white;
+		}
 
         @media(max-width: 500px) {
         	body{
@@ -140,7 +231,7 @@
         	h2{
         		font-size: 20px;
         	}
-        	span, p, button{
+        	span, input, p, button{
         		font-size: 12px;
         	}
         	tbody{
@@ -155,6 +246,13 @@
 	<title>UOK | Students</title>
 </head>
 <body>
+	<div id="modal">
+		<div id="popup">
+			<button id="close">&times;</button>
+			<div id="header"></div>
+			<div id="content"></div>
+		</div>
+	</div>
 	<div class="header">
 		<div class="logo">
 			<img src="/cropped-logo.jpg" alt="Logo">
@@ -178,6 +276,24 @@
 		</thead>
 		<tbody id="table"></tbody>
 	</table>
+	<h2>Your Availability</h2>
+	<table>
+		<thead>
+			<th>اليوم \ الساعة</th>
+			<th>08:00 - 09:00</th>
+			<th>09:00 - 10:00</th>
+			<th>10:00 - 11:00</th>
+			<th>11:00 - 12:00</th>
+			<th>12:00 - 13:00</th>
+			<th>13:00 - 14:00</th>
+			<th>14:00 - 15:00</th>
+			<th>15:00 - 16:00</th>
+		</thead>
+		<tbody id="availability"></tbody>
+	</table>
+	<div class="flex">
+		<button class="btn" id="avl-btn">Apply Changes</button>
+	</div>
 	<script type="text/javascript">
 		window.onload = async () => {
 			const name = decodeURIComponent(window.location.pathname.split('/').pop());
@@ -185,10 +301,28 @@
 			if (NAME === name) {
 				const username = document.getElementById('name'),
 				faculty = document.getElementById('faculty'),
-				table = document.getElementById('table');
+				table = document.getElementById('table'),
+				availability = document.getElementById('availability'),
+				avlBtn = document.getElementById('avl-btn'),
+				modal = document.getElementById('modal'),
+				closeBtn = document.getElementById('close'),
+				header = document.getElementById('header'),
+				content = document.getElementById('content');
 				table.innerHTML = '';
+				availability.innerHTML = '';
 
-				const res = await fetch(`/advisors/details/${name}`);
+				const msgRes = await fetch(`/advisors/show-message/${NAME}`);
+				const msg = await msgRes.json();
+				if (msg && msg !== 'No messages') {
+					modal.style.display = 'block';
+					header.innerHTML = `
+					<h2>You have a message from<br>${msg.sender}</h2>`;
+					content.innerHTML = `<p>${msg.content}</p>
+					<p>${msg.time}</p>`;
+					closeBtn.onclick = () => closeModal(msg.id);
+				}
+
+				const res = await fetch(`/advisors/details/${NAME}`);
 				const data = await res.json();
 
 				if (data) {
@@ -207,11 +341,89 @@
 							</tr>`;
 					}
 				}
+
+				const availablRes = await fetch(`/advisors/availability/${NAME}`);
+				const availablData = await availablRes.json();
+
+				if (availablData) {
+					for (var i = availablData.length - 1; i >= 0; i--) {
+						availability.innerHTML = `
+							<tr class="row">
+							<td id="avb-${i}-day">${availablData[i]['اليوم']}</td>
+							<td><input type="text" id="avb-${i}-1"
+							value="${availablData[i]['08:00 - 09:00'] || ''}"></td>
+							<td><input type="text" id="avb-${i}-2"
+							value="${availablData[i]['09:00 - 10:00'] || ''}"></td>
+							<td><input type="text" id="avb-${i}-3"
+							value="${availablData[i]['10:00 - 11:00'] || ''}"></td>
+							<td><input type="text" id="avb-${i}-4"
+							value="${availablData[i]['11:00 - 12:00'] || ''}"></td>
+							<td><input type="text" id="avb-${i}-5"
+							value="${availablData[i]['12:00 - 13:00'] || ''}"></td>
+							<td><input type="text" id="avb-${i}-6"
+							value="${availablData[i]['13:00 - 14:00'] || ''}"></td>
+							<td><input type="text" id="avb-${i}-7"
+							value="${availablData[i]['14:00 - 15:00'] || ''}"></td>
+							<td><input type="text" id="avb-${i}-8"
+							value="${availablData[i]['15:00 - 16:00'] || ''}"></td>
+						</tr>` + availability.innerHTML;
+					}
+				}
+
+				avlBtn.onclick = async () => {
+					let data = [];
+					for (var i = 0; i <= availability.children.length - 1; i++) {
+						const input1 = document.getElementById(`avb-${i}-1`),
+						input2 = document.getElementById(`avb-${i}-2`),
+						input3 = document.getElementById(`avb-${i}-3`),
+						input4 = document.getElementById(`avb-${i}-4`),
+						input5 = document.getElementById(`avb-${i}-5`),
+						input6 = document.getElementById(`avb-${i}-6`),
+						input7 = document.getElementById(`avb-${i}-7`),
+						input8 = document.getElementById(`avb-${i}-8`),
+						day = document.getElementById(`avb-${i}-day`);
+						data.push({
+							'اليوم': day.innerText,
+							'08:00 - 09:00': input1.value,
+							'09:00 - 10:00': input2.value,
+							'10:00 - 11:00': input3.value,
+							'11:00 - 12:00': input4.value,
+							'12:00 - 13:00': input5.value,
+							'13:00 - 14:00': input6.value,
+							'14:00 - 15:00': input7.value,
+							'15:00 - 16:00': input8.value,
+						});
+					}
+					const res = await fetch(`/advisors/write-availability`, {
+						headers: {
+							'Content-type': 'application/json'
+						},
+						method: 'POST',
+						body: JSON.stringify({
+							name: NAME,
+							data: data
+						})
+					});
+					const resData = await res.json();
+					alert(resData);
+					window.location.reload();
+				};
 			} else {
 				document.body.innerHTML = `<h1 class="not-allow">
 				You are Not Allowed!</h1>`;
 			}
 		};
+
+		async function closeModal (msgId) {
+			const res = await fetch(`/advisors/hide-message/${msgId}`, {
+				headers: {
+					'content-type': 'application/json'
+				}
+			});
+			const msg = await res.json();
+			alert(msg);
+			window.location.reload();
+		}
 
 		function logout(){
 			localStorage.clear();

@@ -172,7 +172,7 @@
 		#msg-form{
 			display: none;
 			width: 30%;
-			aspect-ratio: 1 / .6;
+			height: 95%;
 			border: 1px solid #b4b4b4;
 			border-radius: 8px;
 			padding-bottom: 10px;
@@ -187,7 +187,7 @@
 			border-radius: 7px 7px 0 0;
 			text-align: center;
 		}
-		#msg{
+		#msg, #rate{
 			width: 80%;
 			height: 30px;
 			padding: 5px;
@@ -196,8 +196,11 @@
 			outline: none;
 			color: #0077ff;
 		}
-		#msg:focus{
+		#msg:focus, #rate:focus{
 			border-color: #0077ff;
+		}
+		#rate{
+			width: 60%;
 		}
 		#msg-btn{
 			padding: 8px 16px;
@@ -270,7 +273,7 @@
         		font-size: 10px;
         		padding: 5px 10px;
         	}
-        	#msg{
+        	#msg, #rate{
         		height: 20px;
         	}
         	label{
@@ -300,6 +303,10 @@
 			<form id="msg-form">
 				<label htmlFor="msg">Send Message</label>
 				<input type="text" id="msg">
+				<div style="width: 80%;display: flex; align-items: center; justify-content: space-between;">
+					<p>Rate:</p>
+					<input type="number" id="rate">
+				</div>
 				<button id="msg-btn">Send</button>
 			</form>
 			<button onclick="logout()">Logout</button>
@@ -323,6 +330,21 @@
 		<thead id="marks-head"></thead>
 		<tbody id="marks"></tbody>
 	</table>
+	<h2>Your Advisor's Availability</h2>
+	<table>
+		<thead>
+			<th>اليوم \ الساعة</th>
+			<th>08:00 - 09:00</th>
+			<th>09:00 - 10:00</th>
+			<th>10:00 - 11:00</th>
+			<th>11:00 - 12:00</th>
+			<th>12:00 - 13:00</th>
+			<th>13:00 - 14:00</th>
+			<th>14:00 - 15:00</th>
+			<th>15:00 - 16:00</th>
+		</thead>
+		<tbody id="availability"></tbody>
+	</table>
 	<script type="text/javascript">
 		const number = window.location.pathname.split('/').pop();
 		const ID = localStorage.getItem('ID');
@@ -332,8 +354,10 @@
 			name = document.getElementById('name'),
 			form = document.getElementById('msg-form'),
 			msg = document.getElementById('msg'),
+			rate = document.getElementById('rate'),
 			logo = document.querySelector('.logo'),
 			table = document.getElementById('table'),
+			availability = document.getElementById('availability'),
 			marks = document.getElementById('marks'),
 			marksHead = document.getElementById('marks-head'),
 			modal = document.getElementById('modal'),
@@ -343,6 +367,7 @@
 			window.onload = async () => {
 				marks.innerHTML = '';
 				table.innerHTML = '';
+				availability.innerHTML = '';
 				if (NAME) {
 					form.style.display = 'flex';
 					form.style.flexDirection = 'column';
@@ -354,23 +379,44 @@
 					form.style.display = 'none';
 					logo.classList.remove('logo-show');
 					marksHead.innerHTML = '<th>Course #</th><th>العنوان</th><th>الدرجة (1)</th><th>الدرجة (2)</th><th>الدرجة (3)</th><th>الدرجة (4)</th><th>الدرجة </th>';
-					const msgRes = await fetch(`/students/show-message/${number}`);
+					const advisorRes = await fetch(`/students/advisor-name/${ID}`),
+					advisorName = await advisorRes.json(),
+					availablRes = await fetch(`/advisors/availability/${advisorName}`),
+					availablData = await availablRes.json();
+
+					if (availablData) {
+						for (var i = availablData.length - 1; i >= 0; i--) {
+							availability.innerHTML = `
+								<tr class="row">
+								<td>${availablData[i]['اليوم']}</td>
+								<td>${availablData[i]['08:00 - 09:00'] || ''}</td>
+								<td>${availablData[i]['09:00 - 10:00'] || ''}</td>
+								<td>${availablData[i]['10:00 - 11:00'] || ''}</td>
+								<td>${availablData[i]['11:00 - 12:00'] || ''}</td>
+								<td>${availablData[i]['12:00 - 13:00'] || ''}</td>
+								<td>${availablData[i]['13:00 - 14:00'] || ''}</td>
+								<td>${availablData[i]['14:00 - 15:00'] || ''}</td>
+								<td>${availablData[i]['15:00 - 16:00'] || ''}</td>
+							</tr>` + availability.innerHTML;
+						}
+					}
+				}
+
+				const res = await fetch(`/students/details/${ID}`);
+				const data = await res.json();
+				if (res.status === 200) {
+					id.innerText = data[0]["ID"];
+					name.innerText = data[0]["name"];
+					const msgRes = await fetch(`/students/show-message/${data[0]["name"]}`);
 					const msg = await msgRes.json();
-					if (msg && msgRes.status === 200) {
-						console.log(msg)
+					if (msg && msg !== 'No messages') {
 						modal.style.display = 'block';
 						header.innerHTML = `
 						<h2>You have a message from<br>${msg.sender}</h2>`;
 						content.innerHTML = `<p>${msg.content}</p>
 						<p>${msg.time}</p>`;
+						closeBtn.onclick = () => closeModal(msg.id);
 					}
-				}
-
-				const res = await fetch(`/students/details/${number}`);
-				const data = await res.json();
-				if (res.status === 200) {
-					id.innerText = data[0]["ID"];
-					name.innerText = data[0]["name"];
 					for (var i = data.length - 1; i >= 0; i--) {
 						table.innerHTML += `	
 						<tr class="row">
@@ -431,26 +477,26 @@
 					},
 					method: 'POST',
 					body: JSON.stringify({
-						receiver: id.innerText,
+						receiver: name.innerText,
 						sender: NAME,
-						content: msg.value
+						content: msg.value,
+						rate: rate.value
 					})
 				});
 				const data = await res.json();
 				alert(data);
 			};
 
-			closeBtn.onclick = async () => {
-				const res = await fetch(`/students/delete-message/${number}`, {
+			async function closeModal(msgId) {
+				const res = await fetch(`/students/hide-message/${msgId}`, {
 					headers: {
 						'content-type': 'application/json'
-					},
-					method: 'DELETE'
+					}
 				});
 				const msg = await res.json();
 				alert(msg);
 				window.location.reload();
-			};
+			}
 
 			function logout(){
 				localStorage.clear();
