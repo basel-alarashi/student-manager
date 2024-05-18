@@ -16,7 +16,13 @@ app.get('/', (req, res) => {
 	res.sendFile('pages/home.html', {root: __dirname});
 });
 app.get('/role', (req, res) => {
-	res.sendFile('pages/role.html', {root: '.'});
+	res.sendFile('pages/role.html', {root: __dirname});
+});
+app.get('/dean', (req, res) => {
+	res.sendFile('pages/dean.html', {root: __dirname});
+});
+app.get('/head', (req, res) => {
+	res.sendFile('pages/head.html', {root: __dirname});
 });
 app.get('/medium-bg.jpg', (req, res) => {
 	res.sendFile('images/medium-bg.jpg', {root: __dirname});
@@ -35,5 +41,5 @@ app.get('/cropped-logo.jpg', (req, res) => {
 });
 
 app.listen(3000, () => {
-	console.log('Server is listening in port 3000...');
+	console.log('Server is listening on port 3000...');
 });
