@@ -306,20 +306,29 @@
 	</div>
 	<script type="text/javascript">
 		const course = decodeURIComponent(window.location.pathname.split('/').pop());
-		const NAME = localStorage.getItem('NAME');
+		const NAME = localStorage.getItem('NAME') || localStorage.getItem('DEAN') || localStorage.getItem('HEAD');
 		if (NAME) {
 			const marksBtn = document.getElementById('marks'),
 			attendBtn = document.getElementById('attendance'),
 			addRow = document.getElementById('addRow'),
 			courseId = document.getElementById('id'),
 			title = document.getElementById('title'),
-			table = document.getElementById('table');
-			table.innerHTML = '';
+			table = document.getElementById('table'),
 			attend = document.getElementById('attend');
+			table.innerHTML = '';
 			attend.innerHTML = '';
 			window.onload = async () => {
-				const studentRes = await fetch(`/doctors/courses/${course}`);
-				const studentData = await studentRes.json();
+				const doctorRes = await fetch(`/doctors/details/${NAME}`),
+				doctorData = await doctorRes.json(),
+				studentRes = await fetch(`/doctors/courses/${course}`),
+				studentData = await studentRes.json();
+				let type = null;
+				for (var i = doctorData.length - 1; i >= 0; i--) {
+					if (doctorData[i][
+						Object.keys(doctorData[i])[0]] === course) {
+						type = doctorData[i]['مخبر'];
+					}
+				}
 
 				let students = [];
 				courseId.innerText = studentData[0]['Course #'];
@@ -336,11 +345,12 @@
 						<td>${studentData[i]['الاسم']}</td>
 						<td>${studentData[i]['Lec #']}</td>
 						<td>${studentData[i]['Lab #']}</td>
-						<td><input type="text" id="${i}-1" value="${studentData[i]['الدرجة (1)']}"></td>
-						<td><input type="text" id="${i}-2" value="${studentData[i]['الدرجة (2)']}"></td>
-						<td><input type="text" id="${i}-3" value="${studentData[i]['الدرجة (3)']}"></td>
-						<td><input type="text" id="${i}-4" value="${studentData[i]['الدرجة (4)']}"></td>
-						<td><input type="text" id="${i}-f" value="${studentData[i]['المعدل']}"></td>
+						<td><input type="text" id="${i}-1" value="${studentData[i]['درجة (1) ' + type] || ''}"></td>
+						<td><input type="text" id="${i}-2" value="${studentData[i]['درجة (2) ' + type] || ''}"></td>
+						<td><input type="text" id="${i}-3" value="${studentData[i]['درجة (3) ' + type] || ''}"></td>
+						<td><input type="text" id="${i}-4" value="${studentData[i]['درجة (4) ' + type] || ''}"></td>
+						<td><input type="text" id="${i}-f" value="${studentData[i]['المعدل ' + type] || ''}"></td>
+						<td><button onclick="sendMessage('${studentData[i]['الاسم']}')">إرسال</button></td>
 					</tr>`;
 				}
 
@@ -354,43 +364,52 @@
 				const attendData = await attendRes.json();
 
 				for (var i = attendData.length - 1; i >= 0; i--) {
-					console.log(Object.keys(attendData[i]));
+					let keys = Object.keys(attendData[i]), rate = 0;
+					for (var j = keys.length - 1; j >= 0; j--) {
+						if (attendData[i][keys[j]] === 'غ') {
+							if (keys[j].includes('عملي')) {
+								rate += 2;
+							} else if (keys[j].includes('نظري')) {
+								rate += 4;
+							}
+						}
+					}
 					const row = attend.insertRow(0);
 					row.classList.add('row');
 					let cell15 = row.insertCell(0);
-					cell15.innerHTML = `<input type="text" value="${attendData[i]['15']}" id="att-${i}-15">`;
+					cell15.innerHTML = `<input type="text" value="${attendData[i]['15' + type] || ''}" id="att-${i}-15">`;
 					let cell14 = row.insertCell(0);
-					cell14.innerHTML = `<input type="text" value="${attendData[i]['14']}" id="att-${i}-14">`;
+					cell14.innerHTML = `<input type="text" value="${attendData[i]['14' + type] || ''}" id="att-${i}-14">`;
 					let cell13 = row.insertCell(0);
-					cell13.innerHTML = `<input type="text" value="${attendData[i]['13']}" id="att-${i}-13">`;
+					cell13.innerHTML = `<input type="text" value="${attendData[i]['13' + type] || ''}" id="att-${i}-13">`;
 					let cell12 = row.insertCell(0);
-					cell12.innerHTML = `<input type="text" value="${attendData[i]['12']}" id="att-${i}-12">`;
+					cell12.innerHTML = `<input type="text" value="${attendData[i]['12' + type] || ''}" id="att-${i}-12">`;
 					let cell11 = row.insertCell(0);
-					cell11.innerHTML = `<input type="text" value="${attendData[i]['11']}" id="att-${i}-11">`;
+					cell11.innerHTML = `<input type="text" value="${attendData[i]['11' + type] || ''}" id="att-${i}-11">`;
 					let cell10 = row.insertCell(0);
-					cell10.innerHTML = `<input type="text" value="${attendData[i]['10']}" id="att-${i}-10">`;
+					cell10.innerHTML = `<input type="text" value="${attendData[i]['10' + type] || ''}" id="att-${i}-10">`;
 					let cell9 = row.insertCell(0);
-					cell9.innerHTML = `<input type="text" value="${attendData[i]['9']}" id="att-${i}-9">`;
+					cell9.innerHTML = `<input type="text" value="${attendData[i]['9' + type] || ''}" id="att-${i}-9">`;
 					let cell8 = row.insertCell(0);
-					cell8.innerHTML = `<input type="text" value="${attendData[i]['8']}" id="att-${i}-8">`;
+					cell8.innerHTML = `<input type="text" value="${attendData[i]['8' + type] || ''}" id="att-${i}-8">`;
 					let cell7 = row.insertCell(0);
-					cell7.innerHTML = `<input type="text" value="${attendData[i]['7']}" id="att-${i}-7">`;
+					cell7.innerHTML = `<input type="text" value="${attendData[i]['7' + type] || ''}" id="att-${i}-7">`;
 					let cell6 = row.insertCell(0);
-					cell6.innerHTML = `<input type="text" value="${attendData[i]['6']}" id="att-${i}-6">`;
+					cell6.innerHTML = `<input type="text" value="${attendData[i]['6' + type] || ''}" id="att-${i}-6">`;
 					let cell5 = row.insertCell(0);
-					cell5.innerHTML = `<input type="text" value="${attendData[i]['5']}" id="att-${i}-5">`;
+					cell5.innerHTML = `<input type="text" value="${attendData[i]['5' + type] || ''}" id="att-${i}-5">`;
 					let cell4 = row.insertCell(0);
-					cell4.innerHTML = `<input type="text" value="${attendData[i]['4']}" id="att-${i}-4">`;
+					cell4.innerHTML = `<input type="text" value="${attendData[i]['4' + type] || ''}" id="att-${i}-4">`;
 					let cell3 = row.insertCell(0);
-					cell3.innerHTML = `<input type="text" value="${attendData[i]['3']}" id="att-${i}-3">`;
+					cell3.innerHTML = `<input type="text" value="${attendData[i]['3' + type] || ''}" id="att-${i}-3">`;
 					let cell2 = row.insertCell(0);
-					cell2.innerHTML = `<input type="text" value="${attendData[i]['2']}" id="att-${i}-2">`;
+					cell2.innerHTML = `<input type="text" value="${attendData[i]['2' + type] || ''}" id="att-${i}-2">`;
 					let cell1 = row.insertCell(0);
-					cell1.innerHTML = `<input type="text" value="${attendData[i][Object.keys(attendData[i])[14]]}" id="att-${i}-1">`;
+					cell1.innerHTML = `<input type="text" value="${attendData[i]['1' + type] || ''}" id="att-${i}-1">`;
 					let cellName = row.insertCell(0);
-					cellName.innerHTML = `<input type="text" value="${attendData[i]['الاسم']}" id="att-${i}-name">`;
+					cellName.innerHTML = `<input style="color: ${rate >= 12?'red':null};" type="text" value="${attendData[i]['الاسم'] || ''}" id="att-${i}-name">`;
 					let cellId = row.insertCell(0);
-					cellId.innerHTML = `<input type="text" value="${attendData[i]['الرقم']}" id="att-${i}-id">`;
+					cellId.innerHTML = `<input type="text" value="${attendData[i][Object.keys(attendData[i])[0]] || ''}" id="att-${i}-id">`;
 				}
 			};
 
@@ -448,7 +467,16 @@
 			};
 
 			marksBtn.onclick = async () => {
-				const rows = [];
+				const doctorRes = await fetch(`/doctors/details/${NAME}`),
+				doctorData = await doctorRes.json(),
+				rows = [];
+				let type = null;
+				for (var i = doctorData.length - 1; i >= 0; i--) {
+					if (doctorData[i][
+						Object.keys(doctorData[i])[0]] === course) {
+						type = doctorData[i]['مخبر'];
+					}
+				}
 				for (var i = 0; i < table.children.length; i++) {
 					let id = document.getElementById(`${i}-id`),
 					input1 = document.getElementById(`${i}-1`),
@@ -470,14 +498,28 @@
 						'content-type': 'application/json'
 					},
 					method: 'POST',
-					body: JSON.stringify({course: course, rows: rows})
+					body: JSON.stringify({
+						course: course,
+						rows: rows,
+						type: type
+					})
 				});
 				const data = await res.json();
 				alert(data);
+				window.location.reload();
 			};
 
 			attendBtn.onclick = async () => {
-				const rows = [];
+				const doctorRes = await fetch(`/doctors/details/${NAME}`),
+				doctorData = await doctorRes.json(),
+				rows = [];
+				let type = null;
+				for (var i = doctorData.length - 1; i >= 0; i--) {
+					if (doctorData[i][
+						Object.keys(doctorData[i])[0]] === course) {
+						type = doctorData[i]['مخبر'];
+					}
+				}
 				for (var i = 0; i < attend.children.length; i++){
 					let attId = document.getElementById(`att-${i}-id`),
 					attName = document.getElementById(`att-${i}-name`),
@@ -497,23 +539,23 @@
 					att14 = document.getElementById(`att-${i}-14`),
 					att15 = document.getElementById(`att-${i}-15`);
 					rows.push({
-						'1': att1.value,
-						'2': att2.value,
-						'3': att3.value,
-						'4': att4.value,
-						'5': att5.value,
-						'6': att6.value,
-						'7': att7.value,
-						'8': att8.value,
-						'9': att9.value,
-						'10': att10.value,
-						'11': att11.value,
-						'12': att12.value,
-						'13': att13.value,
-						'14': att14.value,
-						'15': att15.value,
 						'الرقم': attId.value,
 						'الاسم': attName.value,
+						['1' + type]: att1.value,
+						['2' + type]: att2.value,
+						['3' + type]: att3.value,
+						['4' + type]: att4.value,
+						['5' + type]: att5.value,
+						['6' + type]: att6.value,
+						['7' + type]: att7.value,
+						['8' + type]: att8.value,
+						['9' + type]: att9.value,
+						['10' + type]: att10.value,
+						['11' + type]: att11.value,
+						['12' + type]: att12.value,
+						['13' + type]: att13.value,
+						['14' + type]: att14.value,
+						['15' + type]: att15.value
 					});
 				}
 				const res = await fetch('/doctors/write-attends', {
@@ -521,10 +563,14 @@
 						'content-type': 'application/json'
 					},
 					method: 'POST',
-					body: JSON.stringify({course: course, rows: rows})
+					body: JSON.stringify({
+						course: course,
+						rows: rows
+					})
 				});
 				const data = await res.json();
 				alert(data);
+				window.location.reload();
 			};
 		} else {
 			document.body.innerHTML = `<h1 class="not-allow">

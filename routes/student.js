@@ -78,11 +78,11 @@ router.get('/details/:id', async (req, res) => {
 					day: doctorData[j]['اليوم'],
 					time: doctorData[j]['التوقيت'],
 					hall: doctorData[j]['القاعة'],
-					mark1: studentData[i]['الدرجة (1)'],
-					mark2: studentData[i]['الدرجة (2)'],
-					mark3: studentData[i]['الدرجة (3)'],
-					mark4: studentData[i]['الدرجة (4)'],
-					markf: studentData[i]['المعدل'],
+					mark1: parseFloat(studentData[i]['درجة (1) نظري']) + parseFloat(studentData[i]['درجة (1) عملي']) || '',
+					mark2: parseFloat(studentData[i]['درجة (2) نظري']) + parseFloat(studentData[i]['درجة (2) عملي']) || '',
+					mark3: parseFloat(studentData[i]['درجة (3) نظري']) + parseFloat(studentData[i]['درجة (3) عملي']) || '',
+					mark4: parseFloat(studentData[i]['درجة (4) نظري']) + parseFloat(studentData[i]['درجة (4) عملي']) || '',
+					markf: parseFloat(studentData[i]['المعدل نظري']) + parseFloat(studentData[i]['المعدل عملي']) || '',
 				});
 			}
 		}
@@ -90,26 +90,104 @@ router.get('/details/:id', async (req, res) => {
 	res.status(200).json(courses);
 });
 
-router.get('/show-message/:id', (req, res) => {
-	db.get(`SELECT * FROM message WHERE receiver='${req.params.id}'`,
+router.get('/advisor-name/:id', async (req, res) => {
+	const advisorData = await advisorPromise;
+	let name = '';
+	for (var i = advisorData.length - 1; i >= 0; i--) {
+		if (advisorData[i]['ID'] === req.params.id) {
+			name = advisorData[i]['المرشد'];
+		}
+	}
+	res.status(200).json(name);
+});
+
+router.get('/show-message/:name', (req, res) => {
+	db.get(`SELECT * FROM message WHERE receiver='${req.params.name}'
+		AND shown=FALSE`,
 		(err, row) => {
 			if (err) {
 				res.status(500).json(err.message);
 			} else if (row) {
 				res.status(200).json(row);
 			} else {
-				res.status(404).json('No messages');
+				res.status(200).json('No messages');
 			}
 		});
 });
 
-router.delete('/delete-message/:id', (req, res) => {
-	db.run(`DELETE FROM message WHERE receiver='${req.params.id}'`,
+router.get('/dean-messages', (req, res) => {
+	db.all('SELECT * FROM message WHERE rate>=15 ORDER BY rate', (err, rows) => {
+		if (err) {
+			res.status(200).json(err.message);
+		} else {
+			res.status(200).json(rows);
+		}
+	});
+});
+
+router.get('/head-messages', (req, res) => {
+	db.all('SELECT * FROM message ORDER BY time', (err, rows) => {
+		if (err) {
+			res.status(200).json(err.message);
+		} else {
+			res.status(200).json(rows);
+		}
+	});
+});
+
+router.get('/hide-message/:msgId', (req, res) => {
+	db.run(`UPDATE message SET shown=TRUE WHERE
+		id='${req.params.msgId}'`,
 		(err) => {
 			if (err) {
 				res.status(500).json(err.message);
 			} else {
 				res.status(200).json('Message ended.');
+			}
+		});
+});
+
+router.get('/head-data', async (req, res) => {
+	const advisorData = await advisorPromise;
+	let rows = [];
+	for (var i = advisorData.length - 1; i >= 0; i--) {
+		const element = rows.find((value) => {
+			if (value['الاسم'] === advisorData[i]['الاسم']) {
+				return value;
+			}
+		});
+
+		if (!element) {
+			const { Password: password, ...row } = advisorData[i];
+			rows.push({
+				...row,
+				remainHours: 172 - row['Cum Pass Crd']
+			});
+		}
+	}
+	res.status(200).json(rows);
+});
+
+router.post('/dean-deprivation', async (req, res) => {
+	const studentData = await studentPromise;
+	let students = [];
+	for (var i = studentData.length - 1; i >= 0; i--) {
+		students.push(studentData[i]['الاسم']);
+	}
+	db.all(`SELECT DISTINCT sender, receiver
+		FROM message WHERE rate >= ${req.body.rate}`, (err, rows) => {
+			if (err) {
+				res.status(500).json(err.message);
+			} else {
+				let deprivated = [];
+				for (var i = rows.length - 1; i >= 0; i--) {
+					if (students.includes(rows[i].sender)) {
+						deprivated.push(rows[i].sender);
+					} else {
+						deprivated.push(rows[i].receiver);
+					}
+				}
+				res.status(200).json([...new Set(deprivated)]);
 			}
 		});
 });
