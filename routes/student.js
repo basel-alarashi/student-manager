@@ -7,7 +7,7 @@ const db = new sqlite.Database('db.sqlite3', (err) => {
 	if (err) {
 		console.log(err.message);
 	} else {
-		console.log('Connected.');
+		console.log('[STUDENT] Connected.');
 	}
 });
 
@@ -23,6 +23,20 @@ const doctorPromise = new Promise((resolve, reject) => {
 		});
 	});
 });
+
+const advisorPromise = new Promise((resolve, reject) => {
+	d3_module.then((d3) => {
+		fs.readFile('./requirement/advisor.csv', 'utf-8', (err, data) => {
+			if (err) {
+				reject(err);
+			} else {
+				data = d3.csvParse(data);
+				resolve(data);
+			}
+		});
+	});
+});
+
 
 const studentPromise = new Promise((resolve, reject) => {
 	d3_module.then((d3) => {
@@ -60,6 +74,7 @@ router.post('/login', async (req, res) => {
 		res.status(401).json('Sorry, You are not a student in UOK.');
 	}
 });
+
 router.get('/details/:id', async (req, res) => {
 	const studentData = await studentPromise;
 	const doctorData = await doctorPromise;
